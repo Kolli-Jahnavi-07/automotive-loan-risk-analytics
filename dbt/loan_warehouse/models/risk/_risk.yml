@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: mart_portfolio_monthly
+    description: Portfolio size, delinquency (by balance), and credit losses by month.
+    columns:
+      - name: as_of_month
+        data_tests: [unique, not_null]
+      - name: dq_30_plus_rate
+        data_tests:
+          - accepted_range:
+              arguments: {min_value: 0, max_value: 1}
+      - name: annualized_net_loss_rate
+        data_tests:
+          - accepted_range:
+              arguments: {min_value: 0, max_value: 1}
+
+  - name: mart_vintage_curves
+    description: Cumulative gross and net loss by origination quarter and months on book.
+    columns:
+      - name: cum_net_loss_rate
+        data_tests:
+          - accepted_range:
+              arguments: {min_value: 0, max_value: 1}
+
+  - name: mart_risk_segments
+    description: Loss performance by credit tier x LTV band x term band, loans seasoned 12+ months.
+    columns:
+      - name: charge_off_rate
+        data_tests:
+          - accepted_range:
+              arguments: {min_value: 0, max_value: 1}
+
+  - name: mart_dealer_risk
+    description: Dealer early-default rates with a review flag for outliers.
+    columns:
+      - name: dealer_id
+        data_tests: [unique, not_null]

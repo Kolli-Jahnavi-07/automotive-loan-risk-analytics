@@ -1,0 +1,21 @@
+loan_warehouse:
+  target: dev
+  outputs:
+    # Local development and CI: DuckDB reads the silver Parquet written by Spark.
+    dev:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', '../../data/warehouse.duckdb') }}"
+      threads: 4
+
+    # Production target. Same models, run against Snowflake after the silver layer
+    # has been loaded by Snowpipe (see /snowflake). Credentials come from env vars.
+    snowflake:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', '') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', '') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', '') }}"
+      role: TRANSFORMER
+      warehouse: TRANSFORM_WH
+      database: LOAN_RISK
+      schema: ANALYTICS
+      threads: 8

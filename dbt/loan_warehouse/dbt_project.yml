@@ -1,0 +1,26 @@
+name: loan_warehouse
+version: "1.0.0"
+config-version: 2
+profile: loan_warehouse
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # months of history to reprocess on incremental runs, to absorb late servicing corrections
+  late_arrival_months: 2
+
+models:
+  loan_warehouse:
+    staging:
+      +materialized: view
+      +schema: staging
+    core:
+      +materialized: table
+      +schema: core
+    risk:
+      +materialized: table
+      +schema: risk

@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: silver
+    description: >
+      Cleaned Parquet written by the Spark silver job. Locally DuckDB reads the files
+      directly; in Snowflake these are tables in the SILVER schema loaded by Snowpipe.
+    schema: silver
+    config:
+      external_location: "read_parquet('{{ env_var('SILVER_PATH', '../../data/silver') }}/{name}/**/*.parquet', hive_partitioning = true)"
+    tables:
+      - name: borrowers
+      - name: dealers
+      - name: vehicles
+      - name: loans
+      - name: loan_performance

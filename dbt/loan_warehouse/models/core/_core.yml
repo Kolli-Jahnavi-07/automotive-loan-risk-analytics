@@ -1,0 +1,82 @@
+version: 2
+
+models:
+  - name: dim_borrower
+    description: One row per borrower with credit tier and income band.
+    columns:
+      - name: borrower_id
+        data_tests: [unique, not_null]
+      - name: credit_score
+        data_tests:
+          - accepted_range:
+              arguments: {min_value: 300, max_value: 850}
+      - name: credit_tier
+        data_tests:
+          - accepted_values:
+              arguments: {values: [super_prime, prime, near_prime, subprime]}
+
+  - name: dim_dealer
+    columns:
+      - name: dealer_id
+        data_tests: [unique, not_null]
+
+  - name: dim_vehicle
+    columns:
+      - name: vin
+        data_tests: [unique, not_null]
+
+  - name: dim_month
+    columns:
+      - name: month_start
+        data_tests: [unique, not_null]
+
+  - name: fct_loan_origination
+    description: One row per loan with origination terms, collateral, and borrower risk attributes.
+    columns:
+      - name: loan_id
+        data_tests: [unique, not_null]
+      - name: borrower_id
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_borrower'), field: borrower_id}
+      - name: dealer_id
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_dealer'), field: dealer_id}
+      - name: vin
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_vehicle'), field: vin}
+      - name: amount_financed
+        data_tests:
+          - accepted_range:
+              arguments: {min_value: 0}
+      - name: apr
+        data_tests:
+          - accepted_range:
+              arguments: {min_value: 0, max_value: 0.36}
+      - name: term_months
+        data_tests:
+          - accepted_values:
+              arguments: {values: [36, 48, 60, 72, 84], quote: false}
+
+  - name: fct_loan_month
+    description: >
+      One row per loan per performance month. Built incrementally; each run reprocesses
+      the last `late_arrival_months` months so late servicing corrections are applied.
+    columns:
+      - name: loan_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('fct_loan_origination'), field: loan_id}
+      - name: as_of_month
+        data_tests: [not_null]
+      - name: ending_balance
+        data_tests:
+          - accepted_range:
+              arguments: {min_value: 0}
+      - name: dpd_bucket
+        data_tests:
+          - accepted_values:
+              arguments: {values: [current, 30-59, 60-89, 90+, charged_off, paid_off]}

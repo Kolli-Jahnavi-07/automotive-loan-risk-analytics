@@ -1,0 +1,8 @@
+pyspark==4.0.1
+dbt-duckdb==1.11.0
+duckdb>=1.4
+numpy>=2.0
+pandas>=2.2
+pyarrow>=17
+matplotlib>=3.9
+pytest>=8

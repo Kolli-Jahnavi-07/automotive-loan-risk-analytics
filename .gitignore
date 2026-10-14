@@ -1,0 +1,12 @@
+data/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+dbt/loan_warehouse/target/
+dbt/loan_warehouse/logs/
+dbt/loan_warehouse/.user.yml
+logs/
+spark-warehouse/
+metastore_db/
+derby.log
